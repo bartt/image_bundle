@@ -31,7 +31,6 @@ module ImageBundleHelper
     while pos = (block_output =~ re) do
 
       # Store match data for later reference.
-      matched = $~.to_s
       img_tag = $1
       attributes = $2
       img_closing_tag = $3
@@ -53,7 +52,7 @@ module ImageBundleHelper
       while pos = (attributes =~ /([^ =]+?)\s*=\s*["']?([^"']*?)["']/im) do
         attribute = $1
         value = $2
-        inner_continue_pos = pos+$~.to_s.length
+        attr_continue_pos = pos+$~.to_s.length
         case attribute
         when 'src' 
           ping.path = value
@@ -86,7 +85,7 @@ module ImageBundleHelper
           # Pass through all other attributes
           block_rewrite << "#{attribute}=\"#{value}\" "
         end
-        attributes = attributes[inner_continue_pos..-1]
+        attributes = attributes[attr_continue_pos..-1]
       end
 
       # Calculate the height and width of the image based on the
@@ -140,15 +139,15 @@ module ImageBundleHelper
       bundle_styles << images.keys.inject('') do |styles, key| 
         images[key].x_pos = current_y
         current_y += images[key].width
-        styles + ".#{key} {\n	background-image:url(#{sprite_path});\n	background-position: -#{images[key].x_pos} 0;\n}\n"
+        styles + ".#{key} {\n	background-image:url(#{sprite_path});\n	background-position: -#{images[key].x_pos}px 0px;\n}\n"
       end
       bundle_styles << "</style>\n"
     end
 
     # Write the remaining block output that follows the last img tag.
     block_rewrite << block_output
-    buffer << bundle_styles
-    buffer << block_rewrite
+    buffer << bundle_styles if bundle_styles
+    buffer << block_rewrite if block_rewrite
   end
   
 end
