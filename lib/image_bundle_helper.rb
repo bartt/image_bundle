@@ -26,72 +26,65 @@ module ImageBundleHelper
     # styling to use the master image created from the individual
     # images.
     images = Hash.new
-    re = (css_class == nil) ? /(<img\s*)([^>]*?)(\s*\/>)/im : /(<img\s*)([^>]*?class\s*=\s*["']?[^"']*?#{css_class}[^"']*?["']?[^>]*?)(\s*\/>)/im
+    re = (css_class == nil) ? /(<img\s*)([^>]*?)(\s*\/?>)/im : /(<img\s*)([^>]*?class\s*=\s*["']?[^"']*?#{css_class}[^"']*?["']?[^>]*?)(\s*\/?>)/im
     block_rewrite = ''
     while pos = (block_output =~ re) do
 
       # Store match data for later reference.
+      img_match = $~.to_s
       img_tag = $1
       attributes = $2
       img_closing_tag = $3
 
       # Remember where to continue searching from in the next
       # iteration.
-      continue_pos = pos+$~.to_s.length
+      continue_pos = pos+img_match.length
 
-      # Write out the content before the start of the tag plus the
-      # opening portion of the image tag (<img).
+      # Write out the content before the start of the tag 
       block_rewrite << block_output[0..pos-1]
-      block_rewrite << img_tag
+      if img_match =~ /src\=["']?https?:\/\//i then
+        block_rewrite << img_match
+      else
 
-      # Process all attributes of the img tag.
-      height_given = width_given = nil
-      classes = ''
-      remote_img = false
-      ping = ::ImageBundleHelper::Image.new
-      while pos = (attributes =~ /([^ =]+?)\s*=\s*["']?([^"']*?)["']/im) do
-        attribute = $1
-        value = $2
-        attr_continue_pos = pos+$~.to_s.length
-        case attribute
-        when 'src' 
-          ping.path = value
-          if /^http/ =~ ping.path then
+        # Write out the opening portion of the image tag (<img).
+        block_rewrite << img_tag
 
-            # Ignore this remote image. The server would have to pull
-            # in the remote image on each request to check if anything
-            # has changed and the sprite needs refreshing.
-            remote_img = true
-            block_rewrite << "#{attribute}=\"#{value}\" "
-          else
-            
+        # Process all attributes of the img tag.
+        height_given = width_given = nil
+        classes = ''
+        ping = ::ImageBundleHelper::Image.new
+        while pos = (attributes =~ /([^ =]+?)\s*=\s*["']?([^"']*?)["']/im) do
+          attribute = $1
+          value = $2
+          attr_continue_pos = pos+$~.to_s.length
+          case attribute
+          when 'src' 
+            ping.path = value
             # Read only the image's meta data not its image content.
             ping.file = "#{RAILS_ROOT}/public#{ping.path}"
             image = ::Magick::Image.ping(ping.file)[0]
             ping.height = image.rows
             ping.width = image.columns
             block_rewrite << "#{attribute}=\"/images/clear.gif\" "
+          when 'height'
+            height_given = value.to_i
+          when 'width'
+            width_given = value.to_i
+          when 'class'
+
+            # Prepend a space for later concatenation with bndl class.
+            classes = " #{value}"
+          else
+
+            # Pass through all other attributes
+            block_rewrite << "#{attribute}=\"#{value}\" "
           end
-        when 'height'
-          height_given = value.to_i
-        when 'width'
-          width_given = value.to_i
-        when 'class'
-
-          # Prepend a space for later concatenation with bndl class.
-          classes = " #{value}"
-        else
-
-          # Pass through all other attributes
-          block_rewrite << "#{attribute}=\"#{value}\" "
+          attributes = attributes[attr_continue_pos..-1]
         end
-        attributes = attributes[attr_continue_pos..-1]
-      end
 
-      # Calculate the height and width of the image based on the
-      # specified height/width and the source file's height and
-      # width. Scaling needs to happen when the sprite is created
-      if !remote_img then
+        # Calculate the height and width of the image based on the
+        # specified height/width and the source file's height and
+        # width. Scaling needs to happen when the sprite is created
         if height_given == nil then
           if width_given != nil then
             ping.height = (ping.height * (width_given.to_f / ping.width.to_f)).to_i
@@ -113,8 +106,8 @@ module ImageBundleHelper
         block_rewrite << "class =\"#{key}#{classes}\" "
         block_rewrite << "height=\"#{ping.height}\" "
         block_rewrite << "width=\"#{ping.width}\" "
+        block_rewrite << img_closing_tag
       end
-      block_rewrite << img_closing_tag
       block_output = block_output[continue_pos..-1]
     end
 
