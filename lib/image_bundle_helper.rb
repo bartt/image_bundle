@@ -140,7 +140,7 @@ module ImageBundleHelper
     # Write the remaining block output that follows the last img tag.
     block_rewrite << block_output
     buffer << block_rewrite if block_rewrite
-    return bundle_styles if bundle_styles
+    return bundle_styles ||= ''
   end
   
 end
