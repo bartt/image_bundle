@@ -1,13 +1,105 @@
+# ImageBundleHelper adds view helper +image_bundle+. A helper which
+# bundles individual <strong>local images</strong> into a single CSS
+# sprite thereby reducing the number of HTTP requests needed to render
+# the page.
+# 
+# {Yahoo's Exceptional Performance
+# team}[http://developer.yahoo.com/performance/] found that the number
+# of HTTP requests has the biggest impact on page rendering speed. You
+# can inspect your site's performance with the excellent Firefox
+# add-on {YSlow}[http://developer.yahoo.com/yslow/].
+
 module ImageBundleHelper
   require 'rubygems'
   require 'RMagick'
   require 'digest/md5'
 
-  class Image
+  class Image #:nodoc:
     attr_accessor :path, :file, :height, :width, :x_pos
   end
 
-  def image_bundle(css_class = nil, sprite_type = :png, *args, &block) 
+  # === +image_bundle+ takes 3 optional parameters:
+  #
+  # <tt>css_class</tt>::
+  #     When provided <tt>css_class</tt> restricts the bundling of
+  #     images to <tt><img></tt> tags of class <tt>css_class</tt>.
+  #
+  # <tt>sprite_type</tt>::
+  #    By default +image_bundle+ generates a PNG master image. Set
+  #    sprite_type to the image type you'd like to use instead. E.g. GIF
+  #    or JPEG. Any type supported by
+  #    {ImageMagick}[http://www.imagemagick.org/] can be generated. All
+  #    images being bundled will be converted to <tt>sprite_type</tt>.
+  #
+  # <tt>replacement_image</tt>::
+  #    By default +image_bundle+ replaces the +src+ of bundled images
+  #    with <tt>/images/clear.gif</tt>. A 1x1 transparant image is
+  #    included with the +image_bundle+ plugin. You'll find it in the
+  #    +images+ directory of the plugin. Provide
+  #    <tt>replacement_image</tt> if you prefer to use an image of
+  #    different name.
+  # 
+  # === +image_bundle+ does 4 things:
+  # 1. It creates a master image of all bundled images, if it doesn't already exist. 
+  # 1. It rewrites the <tt><img></tt> tags of all images included
+  #    in the bundle to use <tt>replacement_image</tt> instead.
+  # 1. Each included <tt><img></tt> gets a new class <em>added</em> to the
+  #    image's +class+ attribute.  The new class name is unique to the
+  #    image's size and content. 
+  # 1. +image_bundle+ creates matching CSS rules to display the portion
+  #    of the master image equivalent to the <tt><img></tt> tags'
+  #    original image.  The CSS rules are returned as a string so that
+  #    they can be assigned to a variable that can be passed on to the
+  #    view's layout for inclusion in the page's HTML header.
+  #
+  # === Example usages
+  #
+  # Bundle all images included within +image_bundle+'s block. Assign the
+  # return value to a variable that is used in the layout of this page.
+  # 
+  # <% @header_includes = @header_includes.to_s + image_bundle do %>
+  #   <p>+image_bundle+ can wrap any kind of content: HTML, JS, etc.</p>
+  #   <img src="/images/auflag.gif"/></br>
+  #   <p>Bundled images don't need to be adjacent to one another either.</p>
+  #   <img src="/images/nlflag.gif"/></br>
+  #   <img src="/images/frflag.gif"/></br>
+  # <% end %>
+  #
+  # Bundle only images of class <tt>:bundle</tt>. +image_bundle+ scales resized
+  # images accordingly. It calculates the 2nd dimension if only one
+  # dimension is given. Bundled images don't have to be of the same size
+  # either. In this case the CSS rules are included inline after the
+  # +image_bundle+ block. Avoid this when possible as it isn't valid
+  # HTML and causes your browser having to re-layout the page when it
+  # encounters these CSS rules mid page.
+  #
+  # <% @sprite_css = image_bundle(:bundle) do %>
+  #   <p>
+  #     Some static text with <strong>HTML</strong> <em>markup</em>.<br/>
+  #     Plus a dynamic date: <%= Time.now %><br/>
+  #     And an 16x16 <img alt="favicon" class="bundle" src="/favicon.ico" height="16" width="16"/><br/>
+  #     A 6x? <img alt="favicon" class="bundle" src="/favicon.ico" height="6"/><br/>
+  #     A ?x6 <img alt="favicon" class="bundle" src="/favicon.ico" width="6"/><br/>
+  #     An ?x? <img alt="favicon" class="bundle" src="/images/rails.png"/><br/>
+  #     A 6x16 <img alt="favicon" src="/favicon.ico" height="6" width="16"/> not of class bundle<br/>
+  #     My 160x16 multi line example <img alt="favicon" class="bundle" src="/favicon.ico"
+  #     height="160"
+  #     width="16"/><br/>
+  #     Single quote ?x? <img alt="favicon" class='bundle' src="/favicon.ico"/><br/>
+  #     Class 'some bundle' ?x? <img alt="favicon" class='some bundle' src="/favicon.ico"/><br/>
+  #     Src before class ?x160 <img alt="favicon" src="/favicon.ico" class='bundle' width="160"/><br/>
+  #     Src before class 'some bundle' ?x? <img alt="favicon" src="/favicon.ico" class='some bundle'/><br/>
+  #     Src = and id ?x? <img alt="favicon" src="/favicon.ico" id="bla" class = 'some bundle'/><br/>
+  #     Casper ?x? <img alt="favicon" class="bundle" src="/images/casper-1st-birthday.jpg"/><br/>
+  #   </p>
+  #   <p>
+  #     Some additional text.
+  #   </p>
+  # <% end %>
+  # 
+  # <%= @sprite_css %>
+
+  def image_bundle(css_class = nil, sprite_type = :png, replacement_image = '/images/clear.gif', *args, &block) 
     # Bind buffer to the ERB output buffer of the templates.
     buffer = eval("_erbout", block.binding)
 
@@ -65,7 +157,7 @@ module ImageBundleHelper
             image = ::Magick::Image.ping(ping.file)[0]
             ping.height = image.rows
             ping.width = image.columns
-            block_rewrite << "#{attribute}=\"/images/clear.gif\" "
+            block_rewrite << "#{attribute}=\"#{replacement_image}\" "
           when 'height'
             height_given = value.to_i
           when 'width'
