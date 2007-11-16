@@ -14,7 +14,7 @@ module ImageBundleHelper
   require 'RMagick'
   require 'digest/md5'
 
-  SPRITE_BASE_DIR = ENV['IMAGE_BUNDLE_SPRITE_BASE_DIR'] || 'sprites'
+  SPRITE_BASE_DIR = ENV['IMAGE_BUNDLE_SPRITE_BASE_DIR'] || 'sprites' if !defined?(SPRITE_BASE_DIR)
 
   class Image #:nodoc:
     attr_accessor :path, :file, :height, :width, :x_pos
@@ -221,7 +221,7 @@ module ImageBundleHelper
     # Create a sprite when there are source files and if it doesn't
     # already exists.
     if images.length > 0 then
-      sprite_path = SPRITE_BASE_DIR + '/' + ::Digest::MD5.hexdigest(images.keys.inject do |concat_names, key| concat_names + '|' + key end) + ".#{sprite_type}"
+      sprite_path = '/' + SPRITE_BASE_DIR + '/' + ::Digest::MD5.hexdigest(images.keys.inject do |concat_names, key| concat_names + '|' + key end) + ".#{sprite_type}"
       sprite_file = "#{RAILS_ROOT}/public/#{sprite_path}"
       if !File.exists?(sprite_file) then
 
