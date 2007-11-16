@@ -15,6 +15,10 @@ can inspect your site's performance with the excellent Firefox add-on
 Use ImageBundle to automatically replace individual local images into
 CSS sprites.
 
+== Demo
+
+A demo of ImageBundle is available at http://thecodemill.biz/image_bundle/.
+
 == License & Author
 
 :include: LICENSE

@@ -14,6 +14,8 @@ module ImageBundleHelper
   require 'RMagick'
   require 'digest/md5'
 
+  SPRITE_BASE_DIR = ENV['IMAGE_BUNDLE_SPRITE_BASE_DIR'] || 'sprites'
+
   class Image #:nodoc:
     attr_accessor :path, :file, :height, :width, :x_pos
   end
@@ -52,6 +54,19 @@ module ImageBundleHelper
   #    they can be assigned to a variable that can be passed on to the
   #    view's layout for inclusion in the page's HTML header.
   #
+  # === +image_bundle+ uses 1 environment variable:
+  #
+  # By default +image_bundle+ creates sprites in a directory called
+  # +sprites+. +image_bundle+ doesn't use +images+ in order to
+  # eliminate the potential of overwriting your images. Create
+  # +sprites+ in your +public+ directory before using
+  # +image_bundle+. 
+  # 
+  # If you prefer to use a different directory set
+  # <tt>ENV['IMAGE_BUNDLE_SPRITE_BASE_DIR']</tt> in your Rails
+  # environment. IMAGE_BUNDLE_SPRITE_BASE_DIR is relative to your
+  # =public= directory.
+  # 
   # === Example usages
   #
   # Bundle all images included within +image_bundle+'s block. Assign the
@@ -206,8 +221,8 @@ module ImageBundleHelper
     # Create a sprite when there are source files and if it doesn't
     # already exists.
     if images.length > 0 then
-      sprite_path = "/sprites/" + ::Digest::MD5.hexdigest(images.keys.inject do |concat_names, key| concat_names + '|' + key end) + ".#{sprite_type}"
-      sprite_file = "#{RAILS_ROOT}/public#{sprite_path}"
+      sprite_path = SPRITE_BASE_DIR + '/' + ::Digest::MD5.hexdigest(images.keys.inject do |concat_names, key| concat_names + '|' + key end) + ".#{sprite_type}"
+      sprite_file = "#{RAILS_ROOT}/public/#{sprite_path}"
       if !File.exists?(sprite_file) then
 
         # Stack scaled source images left to right.
