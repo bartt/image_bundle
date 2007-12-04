@@ -69,6 +69,10 @@ module ImageBundleHelper
   # 
   # === Example usages
   #
+  # Instruct your controller to user +image_bundle+:
+  #
+  #   helper: image_bundle
+  #
   # Bundle all images included within +image_bundle+'s block. Assign the
   # return value to a variable that is used in the layout of this page.
   # 
@@ -232,8 +236,7 @@ module ImageBundleHelper
         sprite.write(sprite_file)
       end
 
-      # While not valid XHTML, browsers do support style tags inside a
-      # body tag.
+      # Construct style tag to be included in the header.
       current_y = 0
       bundle_styles = "\n<style type=\"text/css\">\n"
       bundle_styles << images.keys.inject('') do |styles, key| 
