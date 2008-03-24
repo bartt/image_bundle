@@ -2,7 +2,7 @@
 # bundles individual <strong>local images</strong> into a single CSS
 # sprite thereby reducing the number of HTTP requests needed to render
 # the page.
-# 
+#
 # {Yahoo's Exceptional Performance
 # team}[http://developer.yahoo.com/performance/] found that the number
 # of HTTP requests has the biggest impact on page rendering speed. You
@@ -40,14 +40,14 @@ module ImageBundleHelper
   #    +images+ directory of the plugin. Provide
   #    <tt>replacement_image</tt> if you prefer to use an image of
   #    different name.
-  # 
+  #
   # === +image_bundle+ does 4 things:
-  # 1. It creates a master image of all bundled images, if it doesn't already exist. 
+  # 1. It creates a master image of all bundled images, if it doesn't already exist.
   # 1. It rewrites the <tt><img></tt> tags of all images included
   #    in the bundle to use <tt>replacement_image</tt> instead.
   # 1. Each included <tt><img></tt> gets a new class <em>added</em> to the
   #    image's +class+ attribute.  The new class name is unique to the
-  #    image's size and content. 
+  #    image's size and content.
   # 1. +image_bundle+ creates matching CSS rules to display the portion
   #    of the master image equivalent to the <tt><img></tt> tags'
   #    original image.  The CSS rules are returned as a string so that
@@ -60,13 +60,13 @@ module ImageBundleHelper
   # +sprites+. +image_bundle+ doesn't use +images+ in order to
   # eliminate the potential of overwriting your images. Create
   # +sprites+ in your +public+ directory before using
-  # +image_bundle+. 
-  # 
+  # +image_bundle+.
+  #
   # If you prefer to use a different directory set
   # <tt>ENV['IMAGE_BUNDLE_SPRITE_BASE_DIR']</tt> in your Rails
   # environment. IMAGE_BUNDLE_SPRITE_BASE_DIR is relative to your
   # =public= directory.
-  # 
+  #
   # === Example usages
   #
   # Instruct your controller to user +image_bundle+:
@@ -75,7 +75,7 @@ module ImageBundleHelper
   #
   # Bundle all images included within +image_bundle+'s block. Assign the
   # return value to a variable that is used in the layout of this page.
-  # 
+  #
   # <% @header_includes = @header_includes.to_s + image_bundle do %>
   #   <p>+image_bundle+ can wrap any kind of content: HTML, JS, etc.</p>
   #   <img src="/images/auflag.gif"/></br>
@@ -115,10 +115,10 @@ module ImageBundleHelper
   #     Some additional text.
   #   </p>
   # <% end %>
-  # 
+  #
   # <%= @sprite_css %>
 
-  def image_bundle(css_class = nil, sprite_type = :png, replacement_image = '/images/clear.gif', *args, &block) 
+  def image_bundle(css_class = nil, sprite_type = :png, replacement_image = '/images/clear.gif', *args, &block)
     # Bind buffer to the ERB output buffer of the templates.
     buffer = eval("_erbout", block.binding)
 
@@ -151,7 +151,7 @@ module ImageBundleHelper
       # iteration.
       continue_pos = pos+img_match.length
 
-      # Write out the content before the start of the tag 
+      # Write out the content before the start of the tag
       block_rewrite << block_output[0..pos-1]
       if img_match =~ /src\=["']?https?:\/\//i then
         block_rewrite << img_match
@@ -164,12 +164,12 @@ module ImageBundleHelper
         height_given = width_given = nil
         classes = ''
         ping = ::ImageBundleHelper::Image.new
-        while pos = (attributes =~ /([^ =]+?)\s*=\s*["']?([^"']*?)["']/im) do
+        while pos = (attributes =~ /([^ =]+?)\s*=\s*(("?([^"=]*?)")|('?([^'=]*?)'))/im) do
           attribute = $1
-          value = $2
+          value = $4 || $6
           attr_continue_pos = pos+$~.to_s.length
           case attribute
-          when 'src' 
+          when 'src'
             ping.path = value
             # Read only the image's meta data not its image content.
             ping.file = "#{RAILS_ROOT}/public#{ping.path}"
@@ -239,10 +239,10 @@ module ImageBundleHelper
       # Construct style tag to be included in the header.
       current_y = 0
       bundle_styles = "\n<style type=\"text/css\">\n"
-      bundle_styles << images.keys.inject('') do |styles, key| 
+      bundle_styles << images.keys.inject('') do |styles, key|
         images[key].x_pos = current_y
         current_y += images[key].width
-        styles + ".#{key} {\n	background-image:url(#{sprite_path});\n	background-position: -#{images[key].x_pos}px 0px;\n}\n"
+        styles + ".#{key} {\n   background-image:url(#{sprite_path});\n background-position: -#{images[key].x_pos}px 0px;\n}\n"
       end
       bundle_styles << "</style>\n"
     end
@@ -252,5 +252,5 @@ module ImageBundleHelper
     buffer << block_rewrite if block_rewrite
     return bundle_styles ||= ''
   end
-  
+
 end
