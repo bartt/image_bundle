@@ -33,6 +33,12 @@ module ImageBundleHelper
   #    {ImageMagick}[http://www.imagemagick.org/] can be generated. All
   #    images being bundled will be converted to <tt>sprite_type</tt>.
   #
+  # <tt>content_target</tt>::
+  #    By default +image_bundle+ produces content for <tt>:head</tt>
+  #    using <tt>content_for</tt>. Provide a different target if you
+  #    prefer a different name. Can be anything that can be converted
+  #    to a symbol.
+  #
   # <tt>replacement_image</tt>::
   #    By default +image_bundle+ replaces the +src+ of bundled images
   #    with <tt>/images/clear.gif</tt>. A 1x1 transparant image is
@@ -50,9 +56,9 @@ module ImageBundleHelper
   #    image's size and content.
   # 1. +image_bundle+ creates matching CSS rules to display the portion
   #    of the master image equivalent to the <tt><img></tt> tags'
-  #    original image.  The CSS rules are returned as a string so that
-  #    they can be assigned to a variable that can be passed on to the
-  #    view's layout for inclusion in the page's HTML header.
+  #    original image.  The CSS rules are collected in
+  #    <tt>content_target</tt> and can be used later with
+  #    <tt>yield</tt>.
   #
   # === +image_bundle+ uses 1 environment variable:
   #
@@ -73,10 +79,9 @@ module ImageBundleHelper
   #
   #   helper: image_bundle
   #
-  # Bundle all images included within +image_bundle+'s block. Assign the
-  # return value to a variable that is used in the layout of this page.
+  # Bundle all images included within +image_bundle+'s block.
   #
-  # <% @header_includes = @header_includes.to_s + image_bundle do %>
+  # <% image_bundle do %>
   #   <p>+image_bundle+ can wrap any kind of content: HTML, JS, etc.</p>
   #   <img src="/images/auflag.gif"/></br>
   #   <p>Bundled images don't need to be adjacent to one another either.</p>
@@ -87,12 +92,9 @@ module ImageBundleHelper
   # Bundle only images of class <tt>:bundle</tt>. +image_bundle+ scales resized
   # images accordingly. It calculates the 2nd dimension if only one
   # dimension is given. Bundled images don't have to be of the same size
-  # either. In this case the CSS rules are included inline after the
-  # +image_bundle+ block. Avoid this when possible as it isn't valid
-  # HTML and causes your browser having to re-layout the page when it
-  # encounters these CSS rules mid page.
+  # either.
   #
-  # <% @sprite_css = image_bundle(:bundle) do %>
+  # <% image_bundle(:bundle) do %>
   #   <p>
   #     Some static text with <strong>HTML</strong> <em>markup</em>.<br/>
   #     Plus a dynamic date: <%= Time.now %><br/>
@@ -118,7 +120,7 @@ module ImageBundleHelper
   #
   # <%= @sprite_css %>
 
-  def image_bundle(css_class = nil, sprite_type = :png, replacement_image = '/images/clear.gif', *args, &block)
+  def image_bundle(css_class = nil, sprite_type = :png, content_target = :head, replacement_image = '/images/clear.gif', *args, &block)
     # Bind buffer to the ERB output buffer of the templates.
     buffer = eval("_erbout", block.binding)
 
@@ -250,7 +252,7 @@ module ImageBundleHelper
     # Write the remaining block output that follows the last img tag.
     block_rewrite << block_output
     buffer << block_rewrite if block_rewrite
-    return bundle_styles ||= ''
+    content_for content_target.to_sym, bundle_styles ||= ''
   end
 
 end
