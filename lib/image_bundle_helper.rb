@@ -20,7 +20,7 @@ module ImageBundleHelper
     attr_accessor :path, :file, :height, :width, :x_pos
   end
 
-  # === +image_bundle+ takes 3 optional parameters:
+  # === +image_bundle+ takes 4 optional parameters:
   #
   # <tt>css_class</tt>::
   #     When provided <tt>css_class</tt> restricts the bundling of
