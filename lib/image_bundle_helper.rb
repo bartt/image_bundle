@@ -17,7 +17,7 @@ module ImageBundleHelper
   SPRITE_BASE_DIR = ENV['IMAGE_BUNDLE_SPRITE_BASE_DIR'] || 'sprites' if !defined?(SPRITE_BASE_DIR)
 
   class Image #:nodoc:
-    attr_accessor :path, :file, :height, :width, :x_pos
+    attr_accessor :path, :file, :size, :height, :width, :x_pos
   end
 
   # === +image_bundle+ takes 4 optional parameters:
@@ -117,8 +117,6 @@ module ImageBundleHelper
   #     Some additional text.
   #   </p>
   # <% end %>
-  #
-  # <%= @sprite_css %>
 
   def image_bundle(css_class = nil, sprite_type = :png, content_target = :head, replacement_image = '/images/clear.gif', *args, &block)
     # Bind buffer to the ERB output buffer of the templates.
@@ -178,6 +176,7 @@ module ImageBundleHelper
             image = ::Magick::Image.ping(ping.file)[0]
             ping.height = image.rows
             ping.width = image.columns
+            ping.size = image.filesize
             block_rewrite << "#{attribute}=\"#{replacement_image}\" "
           when 'height'
             height_given = value.to_i
@@ -214,7 +213,7 @@ module ImageBundleHelper
         end
 
         # Only add unique images and height/width combinations to the hash.
-        key = "bndl#{::Digest::MD5.hexdigest("#{ping.path}:#{ping.height}:#{ping.width}").hash}"
+        key = "bndl#{::Digest::MD5.hexdigest("#{ping.path}:#{ping.size}#{ping.height}:#{ping.width}").hash}"
         images[key] ||= ping
         block_rewrite << "class =\"#{key}#{classes}\" "
         block_rewrite << "height=\"#{ping.height}\" "
