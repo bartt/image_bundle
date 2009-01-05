@@ -120,7 +120,7 @@ module ImageBundleHelper
 
   def image_bundle(css_class = nil, sprite_type = :png, content_target = :head, replacement_image = '/images/clear.gif', *args, &block)
     # Bind buffer to the ERB output buffer of the templates.
-    buffer = eval("_erbout", block.binding)
+    buffer = @output_buffer
 
     # Mark the current position in the buffer
     pos = buffer.length
