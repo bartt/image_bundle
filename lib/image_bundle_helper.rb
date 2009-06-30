@@ -177,6 +177,9 @@ module ImageBundleHelper
             ping.height = image.rows
             ping.width = image.columns
             ping.size = image.filesize
+            # Return all the memory associated with the image to the
+            # system.
+            image.destroy!
             block_rewrite << "#{attribute}=\"#{replacement_image}\" "
           when 'height'
             height_given = value.to_i
@@ -235,6 +238,9 @@ module ImageBundleHelper
           image_list << ::Magick::ImageList.new(ping.file)[0].scale(ping.width, ping.height)
         end.append(false)
         sprite.write(sprite_file)
+        # Return all the memory associated with the image to the
+        # system.
+        sprite.destroy!
       end
 
       # Construct style tag to be included in the header.
