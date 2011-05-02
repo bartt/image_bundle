@@ -172,7 +172,7 @@ module ImageBundleHelper
           when 'src'
             ping.path = value
             # Read only the image's meta data not its image content.
-            ping.file = "#{RAILS_ROOT}/public#{ping.path}"
+            ping.file = "#{Rails.root}/public#{ping.path}"
             image = ::Magick::Image.ping(ping.file)[0]
             ping.height = image.rows
             ping.width = image.columns
@@ -230,7 +230,7 @@ module ImageBundleHelper
     # already exists.
     if images.length > 0 then
       sprite_path = '/' + SPRITE_BASE_DIR + '/' + ::Digest::MD5.hexdigest(images.keys.inject do |concat_names, key| concat_names + '|' + key end) + ".#{sprite_type}"
-      sprite_file = "#{RAILS_ROOT}/public/#{sprite_path}"
+      sprite_file = "#{Rails.root}/public/#{sprite_path}"
       if !File.exists?(sprite_file) then
 
         # Stack scaled source images left to right.
@@ -256,8 +256,8 @@ module ImageBundleHelper
 
     # Write the remaining block output that follows the last img tag.
     block_rewrite << block_output
-    buffer << block_rewrite if block_rewrite
-    content_for content_target.to_sym, bundle_styles ||= ''
+    buffer << raw(block_rewrite) if block_rewrite
+    content_for content_target.to_sym, raw(bundle_styles ||= '')
   end
 
 end
