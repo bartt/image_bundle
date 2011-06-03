@@ -14,7 +14,7 @@ module ImageBundleHelper
   require 'RMagick'
   require 'digest/md5'
 
-  SPRITE_BASE_DIR = ENV['IMAGE_BUNDLE_SPRITE_BASE_DIR'] || 'sprites' if !defined?(SPRITE_BASE_DIR)
+  SPRITE_BASE_DIR ||= ENV['IMAGE_BUNDLE_SPRITE_BASE_DIR'] || 'sprites'
 
   class Image #:nodoc:
     attr_accessor :path, :file, :size, :height, :width, :x_pos
@@ -41,7 +41,7 @@ module ImageBundleHelper
   #
   # <tt>replacement_image</tt>::
   #    By default +image_bundle+ replaces the +src+ of bundled images
-  #    with <tt>/images/clear.gif</tt>. A 1x1 transparant image is
+  #    with <tt>/images/clear.gif</tt>. A 1x1 transparent image is
   #    included with the +image_bundle+ plugin. You'll find it in the
   #    +images+ directory of the plugin. Provide
   #    <tt>replacement_image</tt> if you prefer to use an image of
@@ -119,7 +119,7 @@ module ImageBundleHelper
   # <% end %>
 
   def image_bundle(css_class = nil, sprite_type = :png, content_target = :head, replacement_image = '/images/clear.gif', *args, &block)
-    # Bind buffer to the ERB output buffer of the templates.
+    # Bind buffer to the output buffer of the templates.
     buffer = @output_buffer
 
     # Mark the current position in the buffer
