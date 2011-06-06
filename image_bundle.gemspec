@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/bartt/image_bundle"
   s.summary     = %q{ImageBundle bundles individual images into a single sprite and CSS rules to match}
   s.description = %q{ImageBundle adds a helper to Ruby on Rails to create image sprites and matching CSS rules on the fly. Overhead is minimal as sprites are cached. ImageBundle is rendering framework agnostic.}
+  s.license     = "LGPL-2"
 
   s.rubyforge_project = "image_bundle"
   s.add_dependency "actionpack", "~> 3.0.7"
