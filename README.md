@@ -56,7 +56,7 @@ Create a file `lib/asset_tag_helper.rb` and load it at the end of your
 
 ## License & Author
 
-Copyright (C) 2007 Bart Teeuwisse <bart.teeuwisse@thecodemill.biz>
+Copyright (C) 2007 Bart Teeuwisse
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as
