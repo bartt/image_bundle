@@ -1,7 +1,0 @@
-author: Bart Teeuwisse
-summary: ImageBundleHelper adds view helper image_bundle to bundle individual local images into a single CSS sprite.
-homepage: http://thecodemill.biz/
-plugin: http://thecodemill.biz/repository/plugins/image_bundle/
-license: LGPL
-version: 1.0
-rails_version: 1.2+
