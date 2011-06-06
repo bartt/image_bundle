@@ -4,10 +4,10 @@ ImageBundleHelper adds view helper **image_bundle**. A helper which
 bundles individual local images into a single CSS sprite thereby
 reducing the number of HTTP requests needed to render the page.
 
-[Yahoo's Exceptional Performance team][http://developer.yahoo.com/performance/] found that the number
+[Yahoo's Exceptional Performance team](http://developer.yahoo.com/performance/) found that the number
 of HTTP requests has the biggest impact on page rendering speed. You
 can inspect your site's performance with the excellent Firefox add-on
-[YSlow][http://developer.yahoo.com/yslow/].
+[YSlow](http://developer.yahoo.com/yslow/).
 
 ## Usage
 
