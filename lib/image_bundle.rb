@@ -259,5 +259,8 @@ module ImageBundleHelper
     buffer << raw(block_rewrite) if block_rewrite
     content_for content_target.to_sym, raw(bundle_styles ||= '')
   end
+end
 
+if defined?(ActionView::Base)
+  ActionView::Base.send(:include, ImageBundleHelper)
 end

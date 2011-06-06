@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.description = %q{ImageBundle adds a helper to Ruby on Rails to create image sprites and matching CSS rules on the fly. Overhead is minimal as sprites are cached. ImageBundle is rendering framework agnostic.}
 
   s.rubyforge_project = "image_bundle"
+  s.add_dependency "actionpack", "~> 3.0.7"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
