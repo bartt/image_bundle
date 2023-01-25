@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.license     = "LGPL-2"
 
   s.rubyforge_project = "image_bundle"
-  s.add_dependency "actionpack", "~> 3.0.7"
+  s.add_dependency "actionpack", ">= 3.0.7", "< 7.1.0"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
